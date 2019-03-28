@@ -13,5 +13,7 @@ output_file = "./output/"+str(datetime.date.today().strftime("%Y%m%d"))+"_openda
 logfile = "./output/"+str(datetime.date.today().strftime("%Y%m%d"))+"_log"
 
 
-start_from = 2000
+# A specific range of datasets can be downloaded. This is especially useful when
+# the crawler has crashed at a certain point.
+start_from = 0
 finish_at  = 9000
