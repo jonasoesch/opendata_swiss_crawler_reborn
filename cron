@@ -1,0 +1,1 @@
+35 13 * * 3 docker run -v /Users/jonas/Desktop/opendata_swiss_crawler:/app opendata
