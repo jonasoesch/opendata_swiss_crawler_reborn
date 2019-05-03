@@ -87,7 +87,7 @@ class Download:
         except requests.exceptions.ChunkedEncodingError:
             print "Chunk encoding error"
 
-        self.update_with_dl_information(path=path, status_code=r.status_code, content_type=r.headers['Content-Type'])
+        self.update_with_dl_information(path=path, status_code=r.status_code, content_type=r.headers.get('Content-Type', ''))
 
         if not(self.dl_error) and cfg.keep_data:
             self.status = 'Downloaded'

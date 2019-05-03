@@ -59,71 +59,74 @@ def resume():
 
 
 
-# Get the list of Datasets
-r = requests.get("https://opendata.swiss/api/3/action/package_list")
-packages = r.json()
+try:
+    # Get the list of Datasets
+    r = requests.get("https://opendata.swiss/api/3/action/package_list")
+    packages = r.json()
 
-# packages = {
-#     'result': [
-#         'abfallgefasse',
-#         'bazl-geocat-harvester',
-#         'bodenubersichtskarte-wms-dienst',
-#     ]
-# }
+    # packages = {
+    #     'result': [
+    #         'abfallgefasse',
+    #         'bazl-geocat-harvester',
+    #         'bodenubersichtskarte-wms-dienst',
+    #     ]
+    # }
 
-datasets = resume()
+    datasets = resume()
 
-logging.info("=========== Starting a new run =============")
-logging.info("It's: "+str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")) )
-logging.info("The total number of packages is: " + str(len(packages['result'])))
+    logging.info("=========== Starting a new run =============")
+    logging.info("It's: "+str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")) )
+    logging.info("The total number of packages is: " + str(len(packages['result'])))
 
-for i, package in enumerate(packages['result']):
+    for i, package in enumerate(packages['result']):
 
-    dataset_name = package #packages['result'][i]
-    dataset = None
+        dataset_name = package #packages['result'][i]
+        dataset = None
 
-    if (i > cfg.finish_at): break
-    if (i < cfg.start_from): continue
+        if (i > cfg.finish_at): break
+        if (i < cfg.start_from): continue
 
-    exists = False
-    for ds in datasets:
-        if (ds.id == dataset_name):
-            logging.info("Reading from cache: " + str(i) + ". "+ ds.id)
-            print "Reading from cache: " + str(i) + ". "+ ds.id
-            dataset = ds
-            break
-
-
-    if not(dataset):
-        time.sleep(0.2)
+        exists = False
+        for ds in datasets:
+            if (ds.id == dataset_name):
+                logging.info("Reading from cache: " + str(i) + ". "+ ds.id)
+                print "Reading from cache: " + str(i) + ". "+ ds.id
+                dataset = ds
+                break
 
 
-        try:
-            logging.info("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
-            ds = requests.get("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
-        except (ssl.SSLError):
-            continue
+        if not(dataset):
+            time.sleep(0.2)
 
 
-        if ds.status_code == 200:
-            logging.info("Adding: " + str(i) + ". " + dataset_name)
-            print "Adding: " + str(i) + ". " + dataset_name
-            result = ds.json()['result']
-            dataset = Dataset(result, False)
-            datasets.append(dataset)
+            try:
+                logging.info("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
+                ds = requests.get("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
+            except (ssl.SSLError):
+                continue
 
-        else:
-            logging.info("Status code " + ds.status_code)
 
-    for dl in dataset.downloads:
-        if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
-            print "Downloading..."
-            dl.download()
-        if not(dl.status == 'Analyzed'):
-            print "Analyzing..."
-            dl.analyze()
+            if ds.status_code == 200:
+                logging.info("Adding: " + str(i) + ". " + dataset_name)
+                print "Adding: " + str(i) + ". " + dataset_name
+                result = ds.json()['result']
+                dataset = Dataset(result, False)
+                datasets.append(dataset)
 
-        if(not(cfg.keep_data)):
-            dl.delete_file()
+            else:
+                logging.info("Status code " + ds.status_code)
 
-    dump(datasets)
+        for dl in dataset.downloads:
+            if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
+                print "Downloading..."
+                dl.download()
+            if not(dl.status == 'Analyzed'):
+                print "Analyzing..."
+                dl.analyze()
+
+            if(not(cfg.keep_data)):
+                dl.delete_file()
+
+        dump(datasets)
+except Exception as e:
+    logging.exception("Crawler crashed. Error: %s", e)
