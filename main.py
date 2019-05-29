@@ -114,7 +114,7 @@ try:
                 datasets.append(dataset)
 
             else:
-                logging.info("Status code " + ds.status_code)
+                logging.info("Status code " + str(ds.status_code))
 
         for dl in dataset.downloads:
             if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
