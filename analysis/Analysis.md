@@ -13,6 +13,10 @@ jupyter:
     name: python3
 ---
 
+# The evolution of opendata.swiss
+
+This notebooks contains a quick analysis of data we have been collecting on the datasets available on [opendata.swiss](https://opendata.swiss). Data collection was done by a crawler more or less regularly. Each time the cralwer attemted to downoad the data in each dataset and analyze it.
+
 ```python
 import pandas as pd
 from pdvega import Axes
@@ -213,6 +217,8 @@ Axes({
 
 ## 4. Status Codes
 
+The amount of datasets with non-200 status codes has remained fairly stable over the last year
+
 ```python
 status4 = ods.groupby(["date", "status_code"]).id.count().reset_index()
 status4.head()
@@ -330,7 +336,8 @@ Axes({
     "y": {
         "field": "ct", 
         "type": "quantitative",
-        "stack": "normalize"
+        "stack": "normalize",
+        "axis": {"title": "Share of datasets with a description", "format": ".0%"}
     },
      "tooltip": {
         "field": "description", 
@@ -341,6 +348,10 @@ Axes({
     "height": 300
 }, descs)
 ```
+
+## Terms of use
+
+Recently a clear preference for the `Non commercial allowed, commercial with permission, reference required` terms of use can be seen. It is more strict than the previously most prevalent `Non commercial allowed, commercial allowed, reference required` terms of use.
 
 ```python
 lic = ods.groupby(["date", "rights"]).id.count().to_frame().reset_index()
@@ -373,6 +384,10 @@ Axes({
     "height": 300
 }, lic)
 ```
+
+## Distributions of large files per organization
+
+These distributions show that each organization has a certain profile when it comes to the variety of datasets the publish. Swisstopo as well as the city of Zürich have a ver large variety for example. Others like the BAG typically publsih files of very similar sizes. We take this as indicative, for the variety in content provided.
 
 ```python
 ds = ods[(ods.date > "2018-01-12") & (ods.file_size > 5000000)].copy()
@@ -409,6 +424,10 @@ Axes({
 ```python
 ods[(ods.date > "2018-01-12") & (ods.file_size > 10000000)].head()
 ```
+
+## The end
+
+This analysis has given a rough overview over the recent developments of opendata.swiss. Yet there is much more to discover in the data. If you want to dive in you'll find this notebook as well as all the data on [Github](https://github.com/jonasoesch/opendata_swiss_crawler_reborn)
 
 ```python
 
