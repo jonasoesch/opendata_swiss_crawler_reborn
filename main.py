@@ -116,16 +116,17 @@ try:
             else:
                 logging.info("Status code " + str(ds.status_code))
 
-        for dl in dataset.downloads:
-            if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
-                print "Downloading..."
-                dl.download()
-            if not(dl.status == 'Analyzed'):
-                print "Analyzing..."
-                dl.analyze()
+        if dataset:
+            for dl in dataset.downloads:
+                if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
+                    print "Downloading..."
+                    dl.download()
+                if not(dl.status == 'Analyzed'):
+                    print "Analyzing..."
+                    dl.analyze()
 
-            if(not(cfg.keep_data)):
-                dl.delete_file()
+                if(not(cfg.keep_data)):
+                    dl.delete_file()
 
         dump(datasets)
 except Exception as e:
